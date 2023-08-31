@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 
 const queryClient = new QueryClient();
 
-const MainPage = lazy(() => import('./MainPage.js'));
+const MainPage = lazy(() => import('./components/MainPage'));
+
 export default function MainPageAdaptive() {
 
   const isDesktop = useMediaQuery({ minWidth: 1401 });

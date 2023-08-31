@@ -8,7 +8,6 @@ const tags = ['mmorpg', 'shooter', 'strategy', 'moba', 'racing', 'sports', 'soci
     'tower-defense', 'horror', 'mmorts'];
 
 export default function TagForm( {handleCheckboxChange}) {
-    console.log(handleCheckboxChange);
     return (
     <Form>
       <Form.Group grouped>

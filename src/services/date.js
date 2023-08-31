@@ -1,6 +1,3 @@
-export default class toRussiaDate {
-    toRussiaDate = (date) => { 
-        const data = date.split('-');
-        return data.reverse().join('-');
-    }
+export const toRussiaDate = (date) => { 
+    return new Date(date).toLocaleString('ru-RU', { dateStyle: 'short' })
 }
