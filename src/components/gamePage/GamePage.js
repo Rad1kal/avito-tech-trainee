@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 
 import GetServerData from '../../services/getServerData';
-import GameCard from './components/GameCard';
+import GameCard from './childs/GameCard';
 import {ErrorBlock, LoadingBlock} from '../StatusBlocks/StatusBlocks';
 
 const server = new GetServerData();

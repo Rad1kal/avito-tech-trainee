@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 
 const queryClient = new QueryClient();
 
-const MainPage = lazy(() => import('./components/MainPage'));
+const MainPage = lazy(() => import('./childs/MainPage'));
 
 export default function MainPageAdaptive() {
 
