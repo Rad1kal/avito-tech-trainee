@@ -1,28 +1,31 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Suspense, lazy} from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+
 import './App.css';
-import MainPage from '../mainPage/MainPage';
-import GamePage from '../gamePage/GamePage';
-import {useEffect, useState} from 'react';
-import GetServerData from '../../services/getServerData';
+import MainPage from '../MainPage/MainPageAdaptive';
+
+const GamePage = lazy(() => import('../GamePage/GamePage.js'));
+
+
+const queryClient = new QueryClient();
 
 function App() {
-  const server = new GetServerData();
-  const [cards, setCards] = useState([]);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    server.getGames()
-    .then(games=>setCards(games))
-    .catch(()=>setError(true));
-  }, []);
-
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainPage cards={cards} error={error}/>} />
-        <Route path="/card/:cardId" element={<GamePage cards={cards} />} />
-      </Routes>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={
+            <MainPage  />
+          } />
+          <Route path="/card/:cardId" element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <GamePage queryClient={queryClient}/>
+            </Suspense>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

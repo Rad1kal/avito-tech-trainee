@@ -1,58 +1,124 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Image, Button } from 'semantic-ui-react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Card, Image, Button} from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { useQuery } from 'react-query';
+
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 import GetServerData from '../../services/getServerData';
-import toRussiaDate from '../../services/toRussiaDate';
+import toRussiaDate from '../../services/date';
 
-  
+const server = new GetServerData();
+const dateTranslator = new toRussiaDate();
 
-export default function GamePage() {
+function NextArrow (props){
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{ ...style, display: "block", background: "#D4D4D5" }}
+        onClick={onClick}
+      />
+    );
+};
+
+function PrevArrow (props){
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{ ...style, display: "block", background: "#D4D4D5" }}
+        onClick={onClick}
+      />
+    );
+};
+
+export default function GamePage({queryClient}) {
     const { cardId } = useParams();
-    const navigate = useNavigate(); // Получение объекта history
     
-    const server = new GetServerData();
-    const dateTranslator = new toRussiaDate()
-    
-    const [cardInfo, setInfo] = useState('');
+    const [card, setCard] = useState('');
     const [error, setError] = useState(false);
 
+    const queryKey = ['game', cardId];
+
+    const { data: game, isError } = useQuery(queryKey, () => server.getGame(cardId), {
+        staleTime: 300000, // 5 минут (в миллисекундах)
+    });
+
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        nextArrow: <NextArrow />,
+        prevArrow: <PrevArrow />
+    };
+
     useEffect(() => {
-        server.getGame(cardId)
-            .then(game => setInfo(game))
-            .catch(()=>setError(true));
-    }, [cardId]);
+        if (game) {
+            setCard(game);
+        } else if (isError) {
+            setError(true);
+        }
+    }, [game, isError]);
+
+    // useEffect(()=>{
+    //     async function refetch(){
+    //         await queryClient.invalidateQueries(queryKey);
+    //     }
+    //     refetch();
+    // }, [isError])
      
-    // дата релиза (в российском формате)
-    // карусель скриншотов
+    const sliderSyle = {
+        width: '85%', /* Укажите нужную ширину */
+        margin: '0 auto'
+    }
 
     return (
-        <div>
-            <Button onClick={() => navigate('/')}>Back to Main Page</Button>
+        <div >
+            <Link to="/">
+                <Button> Back to Main Page</Button>
+            </Link>
             {error ? 
-            <p>Nfrjuj ytn!</p> 
-            :
-            <Card>
-                <Image src={cardInfo.thumbnail} wrapped ui={false} />
+            <div className=""><img src={process.env.PUBLIC_URL + '/img/error.gif'} alt="Spinner" /></div>
+            : 
+            card ?
+            <Card style={{paddingBottom: 10}}>
+                <Image src={card.thumbnail} wrapped ui={false} />
                 <Card.Content>
-                    <Card.Header>{cardInfo.title}</Card.Header>
-                    <Card.Description>{cardInfo.genre}</Card.Description>
-                    <Card.Description>{cardInfo.publisher}</Card.Description>
-                    <Card.Description>{cardInfo.developer}</Card.Description>
+                    <Card.Header>{card.title}</Card.Header>
+                    <Card.Description>{card.genre}</Card.Description>
+                    <Card.Description>{card.publisher}</Card.Description>
+                    <Card.Description>{card.developer}</Card.Description>
                     {
-                        cardInfo.minimum_system_requirements ? 
-                            Object.keys(cardInfo.minimum_system_requirements).map((key, id)=><Card.Description key={id}>{key}:{cardInfo.minimum_system_requirements[key]}</Card.Description>)
-                            : 
-                            <p>Loading...</p>
+                        card.minimum_system_requirements 
+                        && 
+                        Object.keys(card.minimum_system_requirements).map((key, id)=><Card.Description key={id}>{key}:{card.minimum_system_requirements[key]}</Card.Description>)
                     }
-                    <Card.Description>{dateTranslator.toRussiaDate(cardInfo.release_date)}</Card.Description>
+                    <Card.Description>{card.release_date && dateTranslator.toRussiaDate(card.release_date)}</Card.Description>
+                    <Card.Header>Screenshots:</Card.Header>
                     {
-                        cardInfo.screenshots ? 
-                            cardInfo.screenshots.map((item, id)=> <Image src={item.image} wrapped ui={false} key={id} />)
-                            :
-                            <p>Loading...</p>
+                        <div style={sliderSyle}>
+                            <Slider {...settings}>
+                            {
+                                card.screenshots
+                                    .map((item, id)=> 
+                                        <div key={id}> 
+                                            <Image src={item.image} size='medium' wrapped key={id} />
+                                        </div>)
+                            }
+                            </Slider>
+                        </div>
                     }
                 </Card.Content>
-            </Card>}
+            </Card> 
+            :
+            <div className=""><img src={process.env.PUBLIC_URL + '/img/spinner.gif'} alt="Spinner" /></div>
+            }
         </div>
     );
 }

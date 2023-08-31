@@ -1,3 +1,4 @@
+
 export default class GetServerData{
 
     _apiBase = 'https://free-to-play-games-database.p.rapidapi.com/api/';
@@ -21,7 +22,11 @@ export default class GetServerData{
         url = this._apiBase + `games`;
       }
   
-      return this._getReq(url);
+      try {
+        return await this._getReq(url);
+      } catch (error) {
+        throw error;
+      }
     }
 
     getGame = async (cardId)=>{
@@ -31,13 +36,13 @@ export default class GetServerData{
     }
 
     _getReq = async (url)=>{
-      let res = await fetch(url, this.options)
-        
-      if (!res.ok) {
-        console.log('Response status:', res.status);
-        // throw new Error(`Network response was not ok`);
-      }
+      let res = await fetch(url, this.options);
 
-      return await res.json(); 
+        if (!res.ok) {
+          throw new Error(res.status);
+        }
+        
+        try {return await res.json()}
+        catch {throw new Error(404)}
     }
 }
