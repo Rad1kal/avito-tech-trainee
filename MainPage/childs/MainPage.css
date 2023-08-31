@@ -1,0 +1,18 @@
+.no-game{
+    margin: 10vh auto;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.main-page-head {
+    margin-bottom: 20px;
+    border: none
+}
+
+.grid .row {
+    min-height: 83vh;
+}
+
+#card-group {
+    gap: 10px;
+}
