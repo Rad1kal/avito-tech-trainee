@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
+import {Button} from 'semantic-ui-react';
 
 import GetServerData from '../../services/getServerData';
 import GameCard from './childs/GameCard';
@@ -36,7 +38,11 @@ export default function GamePage({queryClient}) {
             : 
             loadDone ? <GameCard card={card}></GameCard>
             :
-            <LoadingBlock/>
+            <div className="">
+            <Link to="/">
+                <Button>На главную</Button>
+            </Link>
+            <LoadingBlock/></div>
             }
         </div>
     );

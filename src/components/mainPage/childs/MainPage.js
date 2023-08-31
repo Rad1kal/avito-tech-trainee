@@ -54,7 +54,7 @@ export default function GamesBlock({gameGrid, filterGrid}) {
     };
 
     const isError = Boolean(error);
-    const noGames = cards.length === 0;
+    const haveGames = cards.length>0;
     return (
         <Grid celled>
             <div className='main-page-head'>
@@ -72,12 +72,12 @@ export default function GamesBlock({gameGrid, filterGrid}) {
                     : 
                     isLoading ? <LoadingBlock/>
                     :
-                    noGames ? noGamesBlock 
+                    !haveGames ? noGamesBlock 
                     :
                     cards.map(card => (
                         <Link to={`/card/${card.id}`} key={card.id}>
                             <Card>
-                                <Image src={card.thumbnail} wrapped ui={false} />
+                                {<Image src={card.thumbnail} wrapped ui={false} />}
                                 <Card.Content>
                                 <Card.Header>{card.title}</Card.Header>
                                 <Card.Description>{card.genre}</Card.Description>
